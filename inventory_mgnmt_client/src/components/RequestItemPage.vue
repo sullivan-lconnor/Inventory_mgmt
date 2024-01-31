@@ -5,6 +5,12 @@
       <input type="text" v-model="uuid" placeholder="Enter UUID">
       <button type="submit">Submit</button>
     </form>
+
+    <div v-if="showItemPopup">
+      <p>UUID: {{ item.uuid }}</p>
+      <p>Content: {{ item.content }}</p>
+      <button @click="closeItemPopup">OK</button>
+    </div>
   </div>
 </template>
 
@@ -14,22 +20,32 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      uuid: '', // This will hold the UUID input by the user
+      uuid: '',
+      item: null,
+      showItemPopup: false
     };
   },
   methods: {
     onSubmit() {
-      // Make an HTTP request to your server endpoint
       axios.get(`/api/items/${this.uuid}`)
         .then(response => {
           console.log("Items retrieved:", response.data);
-          // Clear the input or handle the data as needed
+          this.item = response.data;
+          this.showItemPopup = true;
           this.uuid = '';
         })
         .catch(error => {
           console.error('Error retrieving items:', error);
         });
     },
+    closeItemPopup() {
+      this.showItemPopup = false;
+      this.item = null;
+    }
   },
 };
 </script>
+
+<style>
+/* Add styles for your popup */
+</style>

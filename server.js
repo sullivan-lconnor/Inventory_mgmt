@@ -6,6 +6,9 @@ const app = express();
 const port = 8080;
 const host = '0.0.0.0';
 
+// Middleware to parse JSON bodies
+app.use(express.json());
+
 // SQLite database setup
 const dbPath = path.join(__dirname, 'sample_sqlLiteDb.db');
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -39,21 +42,7 @@ function getLocalIP() {
   return 'localhost';
 }
 
-// Serve Vue app in production
-const vueAppPath = path.join(__dirname, 'inventory_mgnmt_client/dist');
-app.use(express.static(vueAppPath));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(vueAppPath, 'index.html'));
-});
-
-
-app.get('/api', (req, res) => {
-  res.send('API Endpoint');
-});
-
-// Middleware to parse JSON bodies
-app.use(express.json());
+/* ROUTE DEFINITIONS START */
 
 // Route to add an item
 app.post('/api/items', (req, res) => {
@@ -72,42 +61,56 @@ app.post('/api/items', (req, res) => {
   });
 });
 
-// Route to get all items
-app.get('/api/items', (req, res) => {
-  console.log('Received GET request on /api/items'); // Log incoming request
+// // Route to get all items
+// app.get('/api/items', (req, res) => {
+//   console.log('Received GET request on /api/items'); // Log incoming request
 
-  const sql = `SELECT * FROM items`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching from database:', err.message); // Log any errors
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    console.log('Items retrieved:', rows); // Log fetched data
-    res.json(rows);
-  });
-});
-
-// // Route to get a single item by UUID
-// app.get('/api/items/:uuid', (req, res) => {
-//   console.log('Received GET request for an item with UUID:', req.params.uuid); // Log incoming request
-
-//   const sql = `SELECT * FROM items WHERE uuid = ?`;
-//   const uuid = req.params.uuid;
-//   db.get(sql, [uuid], (err, row) => {
+//   const sql = `SELECT * FROM items`;
+//   db.all(sql, [], (err, rows) => {
 //     if (err) {
-//       console.error('Error fetching item from database:', err.message); // Log any errors
+//       console.error('Error fetching from database:', err.message); // Log any errors
 //       res.status(500).json({ error: err.message });
 //       return;
 //     }
-//     if (row) {
-//       console.log('Item retrieved:', row); // Log fetched data
-//       res.json(row);
-//     } else {
-//       res.status(404).json({ error: 'Item not found' });
-//     }
+//     console.log('Items retrieved:', rows); // Log fetched data
+//     res.json(rows);
 //   });
 // });
+
+// Route to get a single item by UUID
+app.get('/api/items/:uuid', (req, res) => {
+  console.log('Received GET request for an item with UUID:', req.params.uuid); // Log incoming request
+
+  const sql = `SELECT * FROM items WHERE uuid = ?`;
+  const uuid = req.params.uuid;
+  db.get(sql, [uuid], (err, row) => {
+    if (err) {
+      console.error('Error fetching item from database:', err.message); // Log any errors
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (row) {
+      console.log('Item retrieved:', row); // Log fetched data
+      res.json(row);
+    } else {
+      res.status(404).json({ error: 'Item not found' });
+    }
+  });
+});
+
+/* ROUTE DEFINITIONS END */
+
+// Serve Vue app in production
+const vueAppPath = path.join(__dirname, 'inventory_mgnmt_client/dist');
+app.use(express.static(vueAppPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(vueAppPath, 'index.html'));
+});
+
+app.get('/api', (req, res) => {
+  res.send('API Endpoint');
+});
 
 app.listen(port, host, () => {
   const localIP = getLocalIP();
