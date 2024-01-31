@@ -12,6 +12,11 @@
       </div>
       <button type="submit">Submit</button>
     </form>
+
+    <div v-if="showErrorPopup" class="error-popup">
+      <p>Warning: {{ errorMessage }}</p>
+      <button @click="closeErrorPopup">OK</button>
+    </div>
   </div>
 </template>
 
@@ -24,24 +29,44 @@ export default {
       item: {
         uuid: '',
         content: ''
-      }
+      },
+      showErrorPopup: false,
+      errorMessage: ''
     };
   },
   methods: {
     onSubmit() {
-      // Make an HTTP POST request to your server endpoint
       axios.post('/api/items', this.item)
         .then(response => {
-          // Handle the response, maybe clear the inputs or show a success message
           console.log('Response:', response.data);
           this.item.uuid = '';
           this.item.content = '';
         })
         .catch(error => {
-          // Handle any errors, maybe show an error message
-          console.error('Error submitting item:', error);
+          if (error.response && error.response.status === 500 && error.response.data.error.includes('UNIQUE constraint failed: items.uuid')) {
+            this.errorMessage = 'UUID already in database';
+            this.showErrorPopup = true;
+          } else {
+            console.error('Error submitting item:', error);
+          }
         });
+    },
+    closeErrorPopup() {
+      this.showErrorPopup = false;
+      this.errorMessage = '';
     }
   }
 };
 </script>
+
+<style>
+.error-popup {
+  background-color: red;
+  color: white;
+  padding: 10px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  border: 1px solid darkred;
+}
+</style>
