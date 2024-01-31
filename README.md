@@ -1,6 +1,13 @@
 ## Install reqs
 npm ci
 
+## ensure port is open to traffic on host machine
+Default port: 8080
+To see open ports on your machine:
+    >> sudo ufw status
+To open port on your machine:
+    >> sudo ufw allow 8080
+
 ## Running the Application ##
 
  -- NOTE: development not working due to missing setup for linking sqllite3 port between vite and 
