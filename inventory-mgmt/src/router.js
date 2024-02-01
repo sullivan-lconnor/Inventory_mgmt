@@ -1,14 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
-// Import your component files here
 import HomePage from './components/HomePage.vue';
-import RequestItemPage from './components/RequestItemPage.vue';
-import SubmitItemPage from './components/SubmitItemPage.vue';
+import MainContent from './components/v-main/MainContent.vue';
 
 const routes = [
   { path: '/', component: HomePage },
-  { path: '/request-item', component: RequestItemPage },
-  { path: '/submit-item', component: SubmitItemPage }
+  {
+    path: '/request-item',
+    component: MainContent,
+    name: 'request-item' // Adding a name property
+  },
+  {
+    path: '/submit-item',
+    component: MainContent,
+    name: 'submit-item' // Adding a name property
+  }
 ];
 
 const router = createRouter({

@@ -1,20 +1,25 @@
 <template>
-  <div>
-    <h1>Home Page</h1>
-    <button @click="goToRequestItem">Request Item</button>
-    <button @click="goToSubmitItem">Submit Item</button>
-  </div>
+  <v-app>
+    <router-view></router-view>
+    <AppBar></AppBar>
+    <NavigationDrawer></NavigationDrawer>
+    <MainContent></MainContent>
+    <FooterBar></FooterBar>
+  </v-app>
 </template>
 
 <script>
+import AppBar from './v-main/AppBar.vue';
+import NavigationDrawer from './v-main/NavigationDrawer.vue';
+import MainContent from './v-main/MainContent.vue';
+import FooterBar from './v-main/FooterBar.vue';
+
 export default {
-  methods: {
-    goToRequestItem() {
-      this.$router.push('/request-item');
-    },
-    goToSubmitItem() {
-      this.$router.push('/submit-item');
-    },
-  },
+  components: {
+    AppBar,
+    NavigationDrawer,
+    MainContent,
+    FooterBar
+  }
 };
 </script>
