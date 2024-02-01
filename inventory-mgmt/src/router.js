@@ -13,6 +13,11 @@ const routes = [
     path: '/submit-item',
     component: MainContent,
     name: 'submit-item' // Adding a name property
+  },
+  {
+    path: '/barcode-gen',
+    component: MainContent,
+    name: 'barcode-gen' // Adding a name property
   }
 ];
 
