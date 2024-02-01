@@ -19,7 +19,7 @@
   import QrcodeVue from 'qrcode.vue';
   import { v4 as uuidv4 } from 'uuid';
   
-  const baseURL = 'https://yourwebsite.com?uuid=';
+  const baseURL = 'http://localhost:3000/?uuid=';
   const qrCodes = ref([]);
   
   const generateQRCodeURLs = (baseURL, arraySize) => {
