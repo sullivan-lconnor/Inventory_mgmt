@@ -1,18 +1,53 @@
 <template>
-    <div class="request-item-widget">
-      <h2>Request Item</h2>
-      <form @submit.prevent="onSubmit">
-        <input type="text" v-model="uuid" placeholder="Enter UUID">
-        <button type="submit">Submit</button>
-      </form>
-  
-      <div v-if="showItemPopup" class="item-popup">
-        <p><strong>UUID:</strong> {{ item.uuid }}</p>
-        <p><strong>Content:</strong> {{ item.content }}</p>
-        <button @click="closeItemPopup">OK</button>
-      </div>
-    </div>
-  </template>
+  <div class="request-item-widget">
+    <v-card class="pa-5">
+      <v-card-title class="text-h5">
+        Request Item
+      </v-card-title>
+      <v-form @submit.prevent="onSubmit">
+        <v-text-field
+          label="Enter UUID"
+          v-model="uuid"
+          outlined
+          dense
+        ></v-text-field>
+        <v-btn
+          color="primary"
+          class="mt-3"
+          type="submit"
+        >
+          Submit
+        </v-btn>
+      </v-form>
+
+      <v-dialog
+        v-model="showItemPopup"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h6">
+            Item Details
+          </v-card-title>
+          <v-card-text>
+            <p><strong>UUID:</strong> {{ item.uuid }}</p>
+            <p><strong>Content:</strong> {{ item.content }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="closeItemPopup"
+            >
+              OK
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </div>
+</template>
+
   
   <script>
   import axios from 'axios';

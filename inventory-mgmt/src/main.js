@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import App from './App.vue';
+import HomePage from './components/HomePage.vue'
 import router from './router';
 
 // Vuetify
@@ -14,7 +14,7 @@ const vuetify = createVuetify({
   directives,
 })
 
-createApp(App)
+createApp(HomePage)
 .use(vuetify)
 .use(router)
 .mount('#app')

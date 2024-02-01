@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <router-view></router-view>
     <AppBar></AppBar>
     <NavigationDrawer></NavigationDrawer>
     <MainContent></MainContent>
