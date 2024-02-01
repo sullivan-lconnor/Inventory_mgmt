@@ -1,24 +1,36 @@
 <template>
-    <div class="submit-item-widget">
-      <h2>Submit Item</h2>
-      <form @submit.prevent="onSubmit">
-        <div>
-          <label for="uuid">UUID:</label>
-          <input type="text" id="uuid" v-model="item.uuid" placeholder="Enter UUID">
-        </div>
-        <div>
-          <label for="content">Content:</label>
-          <input type="text" id="content" v-model="item.content" placeholder="Enter Content">
-        </div>
-        <button type="submit">Submit</button>
-      </form>
-  
-      <div v-if="showErrorPopup" class="error-popup">
-        <p>{{ errorMessage }}</p>
-        <button @click="closeErrorPopup">OK</button>
-      </div>
-    </div>
-  </template>
+  <v-card class="pa-4">
+    <v-card-title class="text-h5 pb-3">Submit Item</v-card-title>
+    <v-form @submit.prevent="onSubmit">
+      <v-text-field
+        label="UUID"
+        v-model="item.uuid"
+        placeholder="Enter UUID"
+        outlined
+        dense
+      ></v-text-field>
+      <v-text-field
+        label="Content"
+        v-model="item.content"
+        placeholder="Enter Content"
+        outlined
+        dense
+      ></v-text-field>
+      <v-btn color="primary" class="mt-3" type="submit">Submit</v-btn>
+    </v-form>
+
+    <v-dialog v-model="showErrorPopup" persistent max-width="300px">
+      <v-card>
+        <v-card-title class="text-h6">Error</v-card-title>
+        <v-card-text>{{ errorMessage }}</v-card-text>
+        <v-card-actions>
+          <v-btn color="blue darken-1" text @click="closeErrorPopup">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-card>
+</template>
+
   
   <script>
   import axios from 'axios';
