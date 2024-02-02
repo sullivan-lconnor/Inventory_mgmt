@@ -9,7 +9,7 @@
       >
         <div class="qr-item">
           <qrcode-vue :value="qrCode" :size="128" class="qr-code"></qrcode-vue>
-          <span class="uuid-text">{{ qrCode.split('=')[1] }}</span>
+          <span class="uuid-text" v-html="formatUUID(qrCode)"></span>
         </div>
       </v-col>
     </v-row>
@@ -27,6 +27,7 @@ import html2canvas from 'html2canvas';
 const baseURL = 'https://yourwebsite.com?uuid=';
 const qrCodes = ref([]);
 
+// Function to generate QR code URLs
 const generateQRCodeURLs = (baseURL, arraySize) => {
   return Array.from({ length: arraySize }, () => `${baseURL}${uuidv4()}`);
 };
@@ -34,6 +35,20 @@ const generateQRCodeURLs = (baseURL, arraySize) => {
 const arraySize = 30; // Configurable size for 3x10 array
 qrCodes.value = generateQRCodeURLs(baseURL, arraySize);
 
+// New function to format UUID with <br> tags
+const formatUUID = (qrCode) => {
+  const uuid = qrCode.split('=')[1];
+  const parts = uuid.split('-');
+  return parts.reduce((acc, part, index) => {
+    if (index > 0 && index % 2 === 0 && index < parts.length - 1) {
+      return `${acc}-${part}<br>`;
+    } else {
+      return `${acc}-${part}`;
+    }
+  }).substring(1); // Remove the initial '-' from the reduction process
+};
+
+// Function to generate PDF
 const generatePDF = async () => {
   await nextTick(); // Ensure the DOM is updated
   const element = document.querySelector('.v-container');
