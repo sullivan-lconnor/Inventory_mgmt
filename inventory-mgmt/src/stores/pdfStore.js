@@ -29,16 +29,16 @@ export const usePdfStore = defineStore('pdfStore', {
       const page = pdfDoc.addPage([612, 792]); // US Letter in points (8.5" x 11")
       const font = await pdfDoc.embedFont(StandardFonts.Courier);
 
-      const labelWidth = 612 / 3; // Divide page width by 3 columns
-      const labelHeight = 792 / 10; // Divide page height by 10 rows
-      const qrCodeSize = Math.min(labelWidth, labelHeight) / 4; // Adjust size for smaller QR code and text fit
-      const padding = 10; // Padding from the left edge
-      const textSize = 8; // Reduced text size to fit alongside QR code
+      const labelWidth = 612 / 3;
+      const labelHeight = 792 / 10;
+      const qrCodeSize = Math.min(labelWidth, labelHeight) / 3 * 1.25; // Increase QR code size
+      const padding = 10;
+      const textSize = 6; // Shrink text size to accommodate larger QR code
 
       for (let i = 0; i < this.labels.length; i++) {
         const { uuid, qrCodeDataUri } = this.labels[i];
         const x = (i % 3) * labelWidth + padding; // Left justify with padding
-        const y = 792 - Math.floor(i / 3 + 1) * labelHeight + (labelHeight - qrCodeSize) / 2 - qrCodeSize / 2; // Adjust for vertical centering
+        const y = 792 - Math.floor(i / 3 + 1) * labelHeight + (labelHeight - qrCodeSize) / 2 - qrCodeSize / 2;
 
         // Convert QR code Data URI to image
         const qrImage = await pdfDoc.embedPng(qrCodeDataUri);
@@ -50,16 +50,17 @@ export const usePdfStore = defineStore('pdfStore', {
           height: qrCodeSize,
         });
 
-        // Adjust X position for text to align it next to the QR code
-        const textX = x + qrCodeSize + 5; // Add a small gap after the QR code
-
-        // Draw the UUID text next to the QR code
-        page.drawText(uuid, {
-          x: textX,
-          y: y + qrCodeSize / 2 - textSize / 2, // Vertically center text relative to QR code
+        // Calculate space available for text
+        const textMaxWidth = labelWidth - qrCodeSize - padding * 2;
+        // Draw the UUID text next to the QR code, potentially wrapping it
+        const uuidText = uuid.slice(0, 13) + '\n' + uuid.slice(13); // Example split for multiline
+        page.drawText(uuidText, {
+          x: x + qrCodeSize + 5,
+          y: y + qrCodeSize / 2 - textSize, // Adjust based on actual text height
           size: textSize,
           font: font,
           color: rgb(0, 0, 0),
+          maxWidth: textMaxWidth,
         });
       }
 
