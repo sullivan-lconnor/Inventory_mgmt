@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 import QRCode from 'qrcode';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'; // Correct import for StandardFonts
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export const usePdfStore = defineStore('pdfStore', {
   state: () => ({
@@ -27,12 +27,13 @@ export const usePdfStore = defineStore('pdfStore', {
 
       const pdfDoc = await PDFDocument.create();
       const page = pdfDoc.addPage([612, 792]); // US Letter in points (8.5" x 11")
-      const font = await pdfDoc.embedFont(StandardFonts.Courier); // Use Courier for clear character distinction
+      const font = await pdfDoc.embedFont(StandardFonts.Courier);
 
       const labelWidth = 612 / 3; // Divide page width by 3 columns
       const labelHeight = 792 / 10; // Divide page height by 10 rows
-      const qrCodeSize = Math.min(labelWidth, labelHeight) / 3; // Adjust size for padding
+      const qrCodeSize = Math.min(labelWidth, labelHeight) / 4; // Adjust size for smaller QR code and text fit
       const padding = 10; // Padding from the left edge
+      const textSize = 8; // Reduced text size to fit alongside QR code
 
       for (let i = 0; i < this.labels.length; i++) {
         const { uuid, qrCodeDataUri } = this.labels[i];
@@ -49,14 +50,16 @@ export const usePdfStore = defineStore('pdfStore', {
           height: qrCodeSize,
         });
 
-        // Draw the UUID text below the QR code
-        const textSize = 10; // Adjust as needed
+        // Adjust X position for text to align it next to the QR code
+        const textX = x + qrCodeSize + 5; // Add a small gap after the QR code
+
+        // Draw the UUID text next to the QR code
         page.drawText(uuid, {
-          x: x,
-          y: y - qrCodeSize - textSize, // Adjust Y position to place text below QR code
+          x: textX,
+          y: y + qrCodeSize / 2 - textSize / 2, // Vertically center text relative to QR code
           size: textSize,
           font: font,
-          color: rgb(0, 0, 0), // Correct usage of rgb for color
+          color: rgb(0, 0, 0),
         });
       }
 
