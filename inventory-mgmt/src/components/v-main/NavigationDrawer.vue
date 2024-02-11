@@ -18,13 +18,6 @@
           <v-list-item-title>Request Item</v-list-item-title>
         </v-list-item>
 
-        <v-list-item @click="navigateTo('submit-item')">
-          <v-list-item-icon>
-            <v-icon>mdi-inbox-arrow-up</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>Submit Item</v-list-item-title>
-        </v-list-item>
-
         <v-list-item @click="navigateTo('barcode-gen')">
           <v-list-item-icon>
             <v-icon>mdi-inbox-arrow-up</v-icon>
