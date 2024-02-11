@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 import QRCode from 'qrcode';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 export const usePdfStore = defineStore('pdfStore', {
   state: () => ({
@@ -15,7 +15,7 @@ export const usePdfStore = defineStore('pdfStore', {
         const uuid = uuidv4();
         const url = `http://localhost:3000/view/${uuid}`;
         try {
-          const qrCodeDataUri = await QRCode.toDataURL(url);
+          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 100 });
           this.labels.push({ uuid, url, qrCodeDataUri });
         } catch (error) {
           console.error('Error generating QR code:', error);
@@ -30,20 +30,21 @@ export const usePdfStore = defineStore('pdfStore', {
 
       const labelWidth = 612 / 3; // Divide page width by 3 columns
       const labelHeight = 792 / 10; // Divide page height by 10 rows
+      const qrCodeSize = Math.min(labelWidth, labelHeight) / 2; // Ensuring QR code fits well within the label
 
       for (let i = 0; i < this.labels.length; i++) {
         const { qrCodeDataUri } = this.labels[i];
-        const x = (i % 3) * labelWidth;
-        const y = 792 - (Math.floor(i / 3) + 1) * labelHeight; // Adjusting for PDF coordinate system
+        const x = (i % 3) * labelWidth + (labelWidth - qrCodeSize) / 2; // Center horizontally
+        const y = 792 - Math.floor(i / 3 + 1) * labelHeight + (labelHeight - qrCodeSize) / 2; // Center vertically
 
         // Convert QR code Data URI to Uint8Array
         const qrImage = await pdfDoc.embedPng(qrCodeDataUri);
 
         page.drawImage(qrImage, {
-          x: x + (labelWidth - qrImage.width) / 2,
-          y: y + (labelHeight - qrImage.height) / 2,
-          width: qrImage.width,
-          height: qrImage.height,
+          x: x,
+          y: y,
+          width: qrCodeSize,
+          height: qrCodeSize,
         });
       }
 
