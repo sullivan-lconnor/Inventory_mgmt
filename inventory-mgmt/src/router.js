@@ -19,6 +19,11 @@ const routes = [
     path: '/barcode-gen',
     component: MainContent,
     name: 'barcode-gen' // Adding a name property
+  },
+  {
+    path: '/search-items',
+    component: MainContent,
+    name: 'search-items'
   }
 ];
 

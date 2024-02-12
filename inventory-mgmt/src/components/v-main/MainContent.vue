@@ -6,6 +6,7 @@
       <!-- Pass uuid as a prop directly -->
       <UUIDItemRouter v-if="currentWidget === 'mainpage-item'" :uuid="uuid"></UUIDItemRouter>
       <QRUtility v-if="currentWidget === 'barcode-gen'"/>
+      <SearchUtility v-if="currentWidget === 'search-items'"/>
     </v-container>
   </v-main>
 </template>
@@ -15,6 +16,7 @@
 import RequestItemWidget from '@/components/db-request-widgets/RequestItemWidget.vue';
 import QRUtility from '@/components/barcode-utility/QRUtility.vue';
 import UUIDItemRouter from '@/components/db-request-widgets/UUIDItemRouter.vue';
+import SearchUtility from '@/components/db-request-widgets/SearchUtility.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -28,6 +30,7 @@ export default {
     RequestItemWidget,
     QRUtility,
     UUIDItemRouter,
+    SearchUtility
   },
   setup(props) {
     const route = useRoute();
