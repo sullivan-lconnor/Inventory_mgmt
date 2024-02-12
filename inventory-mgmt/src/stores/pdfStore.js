@@ -15,7 +15,7 @@ export const usePdfStore = defineStore('pdfStore', {
         const uuid = uuidv4();
         const url = `http://localhost:3000/view/${uuid}`;
         try {
-          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 100 });
+          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Increase QR code width for bigger display
           this.labels.push({ uuid, url, qrCodeDataUri });
         } catch (error) {
           console.error('Error generating QR code:', error);
@@ -29,38 +29,52 @@ export const usePdfStore = defineStore('pdfStore', {
       const page = pdfDoc.addPage([612, 792]); // US Letter in points (8.5" x 11")
       const font = await pdfDoc.embedFont(StandardFonts.Courier);
 
-      const labelWidth = 612 / 3;
-      const labelHeight = 792 / 10;
-      const qrCodeSize = Math.min(labelWidth, labelHeight) / 3 * 1.25; // Increase QR code size
-      const padding = 10;
-      const textSize = 6; // Shrink text size to accommodate larger QR code
+      const labelWidth = 612 / 3; // 3 columns
+      const labelHeight = 792 / 10; // 10 rows
+      const qrCodeSize = Math.min(labelWidth, labelHeight) / 3; // Adjusted QR code size
+      const padding = 10; // Padding from the left edge
+      const textSize = 6; // Adjusted text size
 
       for (let i = 0; i < this.labels.length; i++) {
         const { uuid, qrCodeDataUri } = this.labels[i];
-        const x = (i % 3) * labelWidth + padding; // Left justify with padding
-        const y = 792 - Math.floor(i / 3 + 1) * labelHeight + (labelHeight - qrCodeSize) / 2 - qrCodeSize / 2;
+        const columnIndex = i % 3;
+        const rowIndex = Math.floor(i / 3);
+        const x = columnIndex * labelWidth + padding; // Left justify with padding
+
+        // Calculate vertical start position for this label
+        const yStart = 792 - (rowIndex + 1) * labelHeight + labelHeight / 2 - qrCodeSize / 2;
 
         // Convert QR code Data URI to image
         const qrImage = await pdfDoc.embedPng(qrCodeDataUri);
 
         page.drawImage(qrImage, {
           x: x,
-          y: y,
+          y: yStart,
           width: qrCodeSize,
           height: qrCodeSize,
         });
 
-        // Calculate space available for text
-        const textMaxWidth = labelWidth - qrCodeSize - padding * 2;
-        // Draw the UUID text next to the QR code, potentially wrapping it
-        const uuidText = uuid.slice(0, 13) + '\n' + uuid.slice(13); // Example split for multiline
-        page.drawText(uuidText, {
-          x: x + qrCodeSize + 5,
-          y: y + qrCodeSize / 2 - textSize, // Adjust based on actual text height
+        // Split UUID across two lines at a logical breaking point
+        const splitIndex = uuid.indexOf('-', uuid.indexOf('-') + 1); // Find second hyphen
+        const uuidPart1 = uuid.substring(0, splitIndex);
+        const uuidPart2 = uuid.substring(splitIndex + 1);
+        const textY = yStart - textSize * 2; // Adjust Y for text below QR code, accounting for two lines
+
+        // Draw the UUID text in two parts
+        page.drawText(uuidPart1, {
+          x: x,
+          y: textY + textSize, // Position for the first line
           size: textSize,
           font: font,
           color: rgb(0, 0, 0),
-          maxWidth: textMaxWidth,
+        });
+
+        page.drawText(uuidPart2, {
+          x: x,
+          y: textY, // Position for the second line
+          size: textSize,
+          font: font,
+          color: rgb(0, 0, 0),
         });
       }
 
