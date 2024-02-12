@@ -4,6 +4,24 @@ import { v4 as uuidv4 } from 'uuid';
 import QRCode from 'qrcode';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
+// Conversion factor from mm to points (pt)
+const mmToPt = 2.83465;
+
+// Adjustable variables in mm, converted to points
+const pagePaddingTopMm = 0;
+const pagePaddingLeftMm = -30;
+const horizontalSpacingMm = 5;
+const verticalSpacingMm = 5;
+const labelPaddingMm = 2;
+const qrCodeScale = 0.75; // Scale of QR code
+
+// Conversion to points
+const pagePaddingTopPt = pagePaddingTopMm * mmToPt;
+const pagePaddingLeftPt = pagePaddingLeftMm * mmToPt;
+const horizontalSpacingPt = horizontalSpacingMm * mmToPt;
+const verticalSpacingPt = verticalSpacingMm * mmToPt;
+const labelPaddingPt = labelPaddingMm * mmToPt;
+
 export const usePdfStore = defineStore('pdfStore', {
   state: () => ({
     labels: [],
@@ -11,11 +29,11 @@ export const usePdfStore = defineStore('pdfStore', {
   actions: {
     async generateLabels() {
       this.labels = [];
-      for (let i = 0; i < 30; i++) { // 3 columns * 10 rows = 30 labels
+      for (let i = 0; i < 30; i++) {
         const uuid = uuidv4();
         const url = `http://localhost:3000/view/${uuid}`;
         try {
-          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Adjust QR code width for bigger display
+          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Adjust for desired QR code size
           this.labels.push({ uuid, url, qrCodeDataUri });
         } catch (error) {
           console.error('Error generating QR code:', error);
@@ -23,63 +41,64 @@ export const usePdfStore = defineStore('pdfStore', {
       }
     },
     async generatePdf() {
-      await this.generateLabels(); // Ensure labels are ready
+      await this.generateLabels();
 
       const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]); // US Letter in points (8.5" x 11")
+      const page = pdfDoc.addPage([612, 792]);
       const font = await pdfDoc.embedFont(StandardFonts.Courier);
 
-      const labelWidth = 612 / 3; // 3 columns
-      const labelHeight = 792 / 10; // 10 rows
-      const qrCodeSize = Math.min(labelWidth, labelHeight) / 3; // Adjusted QR code size
-      const padding = 10; // Padding from the left edge
-      const textSize = 6; // Adjusted text size
+      const labelWidth = (612 - pagePaddingLeftPt - 2 * horizontalSpacingPt) / 3;
+      const labelHeight = (792 - pagePaddingTopPt - 9 * verticalSpacingPt) / 10;
 
       for (let i = 0; i < this.labels.length; i++) {
         const { uuid, qrCodeDataUri } = this.labels[i];
         const columnIndex = i % 3;
         const rowIndex = Math.floor(i / 3);
-        const x = columnIndex * labelWidth + padding; // Left justify with padding
 
-        // Calculate vertical start position for this label
-        const yStart = 792 - (rowIndex + 1) * labelHeight + labelHeight / 2 - qrCodeSize / 2;
+        const x = pagePaddingLeftPt + columnIndex * (labelWidth + horizontalSpacingPt) + labelPaddingPt;
+        const yStart = 792 - pagePaddingTopPt - (rowIndex + 1) * (labelHeight + verticalSpacingPt) + labelPaddingPt;
 
-        // Convert QR code Data URI to image
+        const qrCodeSize = Math.min(labelWidth, labelHeight) * qrCodeScale - 2 * labelPaddingPt;
+        const qrX = x + (labelWidth - qrCodeSize) / 2;
+        const qrY = yStart + labelHeight - qrCodeSize - labelPaddingPt;
+
         const qrImage = await pdfDoc.embedPng(qrCodeDataUri);
-
         page.drawImage(qrImage, {
-          x: x,
-          y: yStart,
+          x: qrX,
+          y: qrY,
           width: qrCodeSize,
           height: qrCodeSize,
         });
 
-        // Find the third hyphen to keep the dash at the end of the first line
-        const splitIndex = uuid.indexOf('-', uuid.indexOf('-', uuid.indexOf('-') + 1) + 1);
-        const uuidPart1 = uuid.substring(0, splitIndex + 1); // Include the dash in the first line
-        const uuidPart2 = uuid.substring(splitIndex + 1);
-        const textY = yStart - textSize * 2; // Adjust Y for text below QR code, accounting for two lines
+        // Calculating space for UUID text next to the QR code
+        const textX = qrX + qrCodeSize + labelPaddingPt;
+        const textWidth = labelWidth - qrCodeSize - 3 * labelPaddingPt; // Adjust textWidth based on QR code size and padding
+        const textSize = 6; // Smaller text size to fit text next to QR code
 
-        // Draw the UUID text in two parts
+        // Split UUID for two lines if necessary, ensuring dashes are included
+        const uuidPart1 = uuid.substring(0, uuid.lastIndexOf('-') - 4); // Split before the last segment
+        const uuidPart2 = uuid.substring(uuid.lastIndexOf('-') - 4); // Last segment of UUID
+
+        // Draw the UUID text in two parts, right next to the QR code
         page.drawText(uuidPart1, {
-          x: x,
-          y: textY + textSize, // Position for the first line
+          x: textX,
+          y: qrY + qrCodeSize / 2 + textSize, // Position for the first line of UUID
           size: textSize,
           font: font,
           color: rgb(0, 0, 0),
+          maxWidth: textWidth,
         });
-
         page.drawText(uuidPart2, {
-          x: x,
-          y: textY, // Position for the second line
+          x: textX,
+          y: qrY + qrCodeSize / 2, // Position for the second line of UUID
           size: textSize,
           font: font,
           color: rgb(0, 0, 0),
+          maxWidth: textWidth,
         });
       }
 
       const pdfBytes = await pdfDoc.save();
-      // Save the PDF to a file or trigger a download in a web app
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
