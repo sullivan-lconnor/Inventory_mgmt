@@ -15,7 +15,7 @@ export const usePdfStore = defineStore('pdfStore', {
         const uuid = uuidv4();
         const url = `http://localhost:3000/view/${uuid}`;
         try {
-          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Increase QR code width for bigger display
+          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Adjust QR code width for bigger display
           this.labels.push({ uuid, url, qrCodeDataUri });
         } catch (error) {
           console.error('Error generating QR code:', error);
@@ -54,9 +54,9 @@ export const usePdfStore = defineStore('pdfStore', {
           height: qrCodeSize,
         });
 
-        // Split UUID across two lines at a logical breaking point
-        const splitIndex = uuid.indexOf('-', uuid.indexOf('-') + 1); // Find second hyphen
-        const uuidPart1 = uuid.substring(0, splitIndex);
+        // Find the third hyphen to keep the dash at the end of the first line
+        const splitIndex = uuid.indexOf('-', uuid.indexOf('-', uuid.indexOf('-') + 1) + 1);
+        const uuidPart1 = uuid.substring(0, splitIndex + 1); // Include the dash in the first line
         const uuidPart2 = uuid.substring(splitIndex + 1);
         const textY = yStart - textSize * 2; // Adjust Y for text below QR code, accounting for two lines
 
