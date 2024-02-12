@@ -1,15 +1,13 @@
 <template>
   <v-main>
     <v-container fluid>
-      <RequestItemWidget v-if="currentWidget === 'request-item'" />
-      <SubmitItemWidget v-if="currentWidget === 'submit-item'" />
-      <UUIDItemRouter v-if="currentWidget === 'mainpage-item'" :uuid="uuid"></UUIDItemRouter>
-      <QRUtility v-if="currentWidget === 'barcode-gen'"/>
+      <component :is="currentComponent" :uuid="uuid" />
     </v-container>
   </v-main>
 </template>
 
 <script>
+
 import RequestItemWidget from '@/components/db-request-widgets/RequestItemWidget.vue';
 import QRUtility from '@/components/barcode-utility/QRUtility.vue'
 import UUIDItemRouter from '@/components/db-request-widgets/UUIDItemRouter.vue';
@@ -25,12 +23,18 @@ export default {
   },
   setup() {
     const route = useRoute();
-    // Use the route's name to determine the current widget
-    const currentWidget = computed(() => route.name);
-    // Extract the UUID from the route parameters
     const uuid = computed(() => route.params.uuid);
+    
+    const currentComponent = computed(() => {
+      switch (route.name) {
+        case 'request-item': return RequestItemWidget;
+        case 'mainpage-item': return UUIDItemRouter;
+        case 'barcode-gen': return QRUtility;
+        default: return null; // No component for unmatched routes
+      }
+    });
 
-    return { currentWidget, uuid };
+    return { currentComponent, uuid };
   }
 };
 </script>
