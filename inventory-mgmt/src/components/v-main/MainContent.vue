@@ -3,30 +3,41 @@
     <v-container fluid>
       <RequestItemWidget v-if="currentWidget === 'request-item'" />
       <SubmitItemWidget v-if="currentWidget === 'submit-item'" />
+      <!-- Pass uuid as a prop directly -->
+      <UUIDItemRouter v-if="currentWidget === 'mainpage-item'" :uuid="uuid"></UUIDItemRouter>
       <QRUtility v-if="currentWidget === 'barcode-gen'"/>
+      <SearchUtility v-if="currentWidget === 'search-items'"/>
     </v-container>
   </v-main>
 </template>
 
 <script>
+
 import RequestItemWidget from '@/components/db-request-widgets/RequestItemWidget.vue';
-import SubmitItemWidget from '@/components/db-request-widgets/SubmitItemWidget.vue';
 import QRUtility from '@/components/barcode-utility/QRUtility.vue';
+import UUIDItemRouter from '@/components/db-request-widgets/UUIDItemRouter.vue';
+import SearchUtility from '@/components/db-request-widgets/SearchUtility.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default {
   name: "MainContent",
+  props: {
+    // Receive UUID as a prop
+    uuid: String,
+  },
   components: {
     RequestItemWidget,
-    SubmitItemWidget,
-    QRUtility
+    QRUtility,
+    UUIDItemRouter,
+    SearchUtility
   },
-  setup() {
+  setup(props) {
     const route = useRoute();
-    const currentWidget = computed(() => route.name); // Use route name instead of path segment
+    // Use the route's name to determine the current widget
+    const currentWidget = computed(() => route.name);
 
-    return { currentWidget };
+    return { currentWidget, uuid: props.uuid };
   }
 };
 </script>

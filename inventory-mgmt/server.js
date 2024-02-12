@@ -99,6 +99,34 @@ app.get('/api/items/:uuid', (req, res) => {
   });
 });
 
+// Route to search items by column with a query
+app.get('/api/requests/search', (req, res) => {
+  const { column, query } = req.query;
+
+  // For simplicity, handle only the 'uuid' column in this example
+  if (column === 'uuid') {
+    let sql = `SELECT * FROM items`;
+    const params = [];
+
+    // If query is not empty, modify the SQL to include a LIKE clause
+    if (query) {
+      sql += ` WHERE uuid LIKE ?`;
+      params.push(`%${query}%`);
+    }
+
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        console.error('Error searching in database:', err.message);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  } else {
+    res.status(400).json({ error: 'Invalid search parameters' });
+  }
+});
+
 /* ROUTE DEFINITIONS END */
 
 // Serve Vue app in production

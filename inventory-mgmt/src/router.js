@@ -10,14 +10,20 @@ const routes = [
     name: 'request-item' // Adding a name property
   },
   {
-    path: '/submit-item',
+    path: '/mainpage-item/:uuid', // Using dynamic segment for UUID
     component: MainContent,
-    name: 'submit-item' // Adding a name property
+    name: 'mainpage-item', 
+    props: true // Enables route params to be passed as props to the component
   },
   {
     path: '/barcode-gen',
     component: MainContent,
     name: 'barcode-gen' // Adding a name property
+  },
+  {
+    path: '/search-items',
+    component: MainContent,
+    name: 'search-items'
   }
 ];
 
