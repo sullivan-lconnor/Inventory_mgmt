@@ -26,10 +26,13 @@
   
   export default {
     name: 'UUIDInput',
+    props: {
+      uuid: String, // Accept uuid as prop
+    },
     data() {
       return {
         item: {
-          uuid: '',
+          uuid: this.uuid, // Initialize uuid with prop value
           content: ''
         }
       };
