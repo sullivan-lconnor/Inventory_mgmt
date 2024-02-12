@@ -8,10 +8,10 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 const mmToPt = 2.83465;
 
 // Adjustable variables in mm, converted to points
-const pagePaddingTopMm = 0;
+const pagePaddingTopMm = 25;
 const pagePaddingLeftMm = -30;
-const horizontalSpacingMm = 5;
-const verticalSpacingMm = 5;
+const horizontalSpacingMm = -20;
+const verticalSpacingMm = -6;
 const labelPaddingMm = 2;
 const qrCodeScale = 0.75; // Scale of QR code
 
@@ -24,6 +24,8 @@ const labelPaddingPt = labelPaddingMm * mmToPt;
 
 export const usePdfStore = defineStore('pdfStore', {
   state: () => ({
+    // Example IP address, adjust as needed
+    serverIp: 'http://192.168.5.143:8080/',
     labels: [],
   }),
   actions: {
@@ -31,9 +33,12 @@ export const usePdfStore = defineStore('pdfStore', {
       this.labels = [];
       for (let i = 0; i < 30; i++) {
         const uuid = uuidv4();
-        const url = `http://localhost:3000/view/${uuid}`;
+        // Construct the URL using the server IP and dynamic segment for UUID
+        const url = `${this.serverIp}/mainpage-item/${uuid}`;
         try {
-          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 }); // Adjust for desired QR code size
+          // Generate QR code Data URI with the constructed URL
+          const qrCodeDataUri = await QRCode.toDataURL(url, { margin: 1, width: 120 });
+          // Push the generated details into the labels array
           this.labels.push({ uuid, url, qrCodeDataUri });
         } catch (error) {
           console.error('Error generating QR code:', error);
