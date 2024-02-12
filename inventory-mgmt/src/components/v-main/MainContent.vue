@@ -11,6 +11,7 @@
 </template>
 
 <script>
+
 import RequestItemWidget from '@/components/db-request-widgets/RequestItemWidget.vue';
 import QRUtility from '@/components/barcode-utility/QRUtility.vue';
 import UUIDItemRouter from '@/components/db-request-widgets/UUIDItemRouter.vue';
