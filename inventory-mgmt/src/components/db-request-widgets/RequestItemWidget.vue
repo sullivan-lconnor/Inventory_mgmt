@@ -49,38 +49,53 @@
 </template>
 
   
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    name: 'RequestItemWidget',
-    data() {
-      return {
-        uuid: '',
-        item: {},
-        showItemPopup: false
-      };
-    },
-    methods: {
-      onSubmit() {
-        axios.get(`/api/items/${this.uuid}`)
-          .then(response => {
-            this.item = response.data;
-            this.showItemPopup = true;
-            this.uuid = '';
-          })
-          .catch(error => {
-            console.error('Error retrieving items:', error);
-            // Consider adding error handling for the UI
-          });
-      },
-      closeItemPopup() {
-        this.showItemPopup = false;
-        this.item = null;
+<script>
+import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore'; // Ensure this is pointing to your auth store
+
+export default {
+  name: 'RequestItemWidget',
+  data() {
+    return {
+      uuid: '',
+      item: {},
+      showItemPopup: false,
+    };
+  },
+  methods: {
+    onSubmit() {
+      const authStore = useAuthStore(); // Access the auth store
+      
+      // Ensure you have the token. If not, handle accordingly
+      if (!authStore.token) {
+        console.error('No authentication token available.');
+        // You might want to redirect to the login page or show an error message
+        return;
       }
+
+      axios.get(`/api/items/${this.uuid}`, {
+        headers: {
+          // Include the token in the request headers
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+      .then(response => {
+        this.item = response.data;
+        this.showItemPopup = true;
+        this.uuid = ''; // Clear the input field
+      })
+      .catch(error => {
+        console.error('Error retrieving item:', error);
+        // Consider adding error handling for the UI
+      });
+    },
+    closeItemPopup() {
+      this.showItemPopup = false;
+      this.item = null; // Corrected from 'this.item = null;' to ensure consistency
     }
-  };
-  </script>
+  }
+};
+</script>
   
   <style scoped>
   .request-item-widget {

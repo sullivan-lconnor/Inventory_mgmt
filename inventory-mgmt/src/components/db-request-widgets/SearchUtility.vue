@@ -43,25 +43,34 @@
 
 <script>
 import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore'; // Adjust the path as necessary
 
 export default {
   name: 'SearchUtility',
   data() {
     return {
-      searchColumn: 'uuid', // Default search column
+      searchColumn: 'uuid',
       searchQuery: '',
-      items: [], // To hold search results
+      items: [],
     };
   },
   methods: {
     onSubmit() {
-      axios.get(`/api/requests/search?column=${this.searchColumn}&query=${this.searchQuery}`)
+      const authStore = useAuthStore(); // Use the auth store
+      const config = {
+        headers: {
+          // Include the token in the request headers
+          Authorization: `Bearer ${authStore.token}`
+        }
+      };
+
+      axios.get(`/api/requests/search?column=${this.searchColumn}&query=${this.searchQuery}`, config)
         .then(response => {
-          this.items = response.data; // Assume the API returns an array of items
+          this.items = response.data;
         })
         .catch(error => {
           console.error('Error retrieving items:', error);
-          this.items = []; // Reset items on error
+          this.items = [];
         });
     },
   },

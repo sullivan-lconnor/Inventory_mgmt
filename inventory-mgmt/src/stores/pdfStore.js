@@ -25,7 +25,7 @@ const labelPaddingPt = labelPaddingMm * mmToPt;
 export const usePdfStore = defineStore('pdfStore', {
   state: () => ({
     // Example IP address, adjust as needed
-    serverIp: 'http://192.168.5.143:8080',
+    serverIp: 'http://192.168.1.171:8080',
     labels: [],
   }),
   actions: {

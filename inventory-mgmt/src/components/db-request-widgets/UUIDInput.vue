@@ -64,9 +64,10 @@
 
 <script>
 import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore'; // Adjust the path as necessary
 
 export default {
-  name: 'UUIDInput',
+  name: 'ItemInput',
   props: {
     uuid: String, // Accept uuid as prop
   },
@@ -79,21 +80,27 @@ export default {
         len: null,
         height: null,
         weight: null,
-        quantity: null
-      }
+        quantity: null,
+      },
     };
   },
   methods: {
     submitItem() {
-      axios.post('/api/items', this.item)
-        .then(() => {
-          this.$emit('item-submitted');
-          this.$router.push('/'); // Navigate to a confirmation or list page
-        })
-        .catch(error => {
-          console.error('Error submitting item:', error);
-          // Handle submission error
-        });
+      const authStore = useAuthStore(); // Access the auth store
+
+      axios.post('/api/items', this.item, {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+      .then(() => {
+        this.$emit('item-submitted');
+        this.$router.push('/'); // Navigate to a confirmation or list page
+      })
+      .catch(error => {
+        console.error('Error submitting item:', error);
+        // Handle submission error
+      });
     }
   }
 };

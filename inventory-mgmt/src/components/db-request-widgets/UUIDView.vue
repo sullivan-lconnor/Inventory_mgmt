@@ -21,9 +21,10 @@
 
 <script>
 import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore'; // Ensure this is pointing to your auth store
 
 export default {
-  name: 'UUIDView',
+  name: 'ItemDetailView',
   props: {
     uuid: String
   },
@@ -37,25 +38,39 @@ export default {
   },
   methods: {
     fetchItem() {
-      axios.get(`/api/items/${this.uuid}`)
-        .then(response => {
-          this.item = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching item:', error);
-          this.item = null;
-        });
+      const authStore = useAuthStore(); // Access the auth store
+      
+      axios.get(`/api/items/${this.uuid}`, {
+        headers: {
+          // Include the token in the request headers
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+      .then(response => {
+        this.item = response.data;
+      })
+      .catch(error => {
+        console.error('Error fetching item:', error);
+        this.item = null; // Handle fetch error
+      });
     },
     updateItem() {
-      axios.put(`/api/items/${this.uuid}`, this.item)
-        .then(() => {
-          alert('Item updated successfully');
-          // Optionally navigate back or refresh the item
-        })
-        .catch(error => {
-          console.error('Error updating item:', error);
-          // Handle update error (e.g., show a notification or error message)
-        });
+      const authStore = useAuthStore(); // Access the auth store
+
+      axios.put(`/api/items/${this.uuid}`, this.item, {
+        headers: {
+          // Include the token in the request headers
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+      .then(() => {
+        alert('Item updated successfully');
+        // Optionally navigate back or refresh the item
+      })
+      .catch(error => {
+        console.error('Error updating item:', error);
+        // Handle update error (e.g., show a notification or error message)
+      });
     }
   }
 };

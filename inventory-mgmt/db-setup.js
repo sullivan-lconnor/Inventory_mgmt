@@ -15,6 +15,7 @@ export const initializeDb = () => {
       db.run(`CREATE TABLE IF NOT EXISTS items (
         unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
         uuid TEXT NOT NULL,
+        user_id TEXT NOT NULL,
         name TEXT,
         joy_percentage INTEGER,
         len INTEGER,

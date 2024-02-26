@@ -10,7 +10,8 @@
   import axios from 'axios';
   import UUIDView from '@/components/db-request-widgets/UUIDView.vue';
   import UUIDInput from '@/components/db-request-widgets/UUIDInput.vue';
-  
+  import { useAuthStore } from '@/stores/authStore';
+
   export default {
     name: 'UUIDItemRouter',
     components: {
@@ -31,7 +32,13 @@
     methods: {
       async checkUUIDExists() {
         try {
-          const response = await axios.get(`/api/items/${this.uuid}`);
+          const authStore = useAuthStore();
+
+          const response = await axios.get(`/api/items/${this.uuid}`, {
+            headers: {
+              Authorization: `Bearer ${authStore.token}`
+            }
+          });
           // Assuming the backend returns a 404 or similar when the UUID doesn't exist
           this.uuidExists = !!response.data;
         } catch (error) {

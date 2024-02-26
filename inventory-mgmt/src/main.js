@@ -3,6 +3,9 @@ import HomePage from './components/HomePage.vue'
 import router from './router';
 import { createPinia } from 'pinia';
 
+// Import the auth store
+import { useAuthStore } from './stores/authStore'; // Adjust the path as necessary
+
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -16,8 +19,17 @@ const vuetify = createVuetify({
 })
 const pinia = createPinia();
 
-createApp(HomePage)
-.use(vuetify)
-.use(router)
-.use(pinia)
-.mount('#app')
+// Initialize the app
+const app = createApp(HomePage);
+
+// Use plugins
+app.use(vuetify);
+app.use(router);
+app.use(pinia);
+
+// Load the user authentication state from storage
+const authStore = useAuthStore();
+authStore.loadUserFromStorage(); // This will load the user state right after Pinia is initialized
+
+// Finally, mount the app
+app.mount('#app');
