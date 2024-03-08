@@ -64,6 +64,7 @@
 
 <script>
 import axios from 'axios';
+import { useUtilsStore } from '@/stores/utilsStore';
 
 export default {
   name: 'UUIDInput',
@@ -73,7 +74,7 @@ export default {
   data() {
     return {
       item: {
-        uuid: this.uuid, // Initialize uuid with prop value
+        uuid: this.uuid || useUtilsStore().generateUUID(), // Initialize uuid with prop value or generate new if prop not avaliable
         name: '',
         joy_percentage: null,
         len: null,

@@ -14,7 +14,7 @@
       <p><strong>Last Modified:</strong> {{ item.last_modified }}</p>
     </v-card-text>
     <v-btn color="primary" @click="updateItem">Save Changes</v-btn>
-    <v-btn color="secondary" @click="$router.push('/')">Back to List</v-btn>
+    <v-btn color="secondary" @click="$router.push('/search-items')">Back to List</v-btn>
   </v-card>
   <v-alert type="error" v-else>No item found for this UUID.</v-alert>
 </template>

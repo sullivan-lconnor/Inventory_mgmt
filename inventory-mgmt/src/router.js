@@ -24,6 +24,11 @@ const routes = [
     path: '/search-items',
     component: MainContent,
     name: 'search-items'
+  },
+  {
+    path: '/new-item',
+    component: MainContent,
+    name: 'new-item'
   }
 ];
 
