@@ -7,6 +7,7 @@
       <UUIDItemRouter v-if="currentWidget === 'mainpage-item'" :uuid="uuid"></UUIDItemRouter>
       <QRUtility v-if="currentWidget === 'barcode-gen'"/>
       <SearchUtility v-if="currentWidget === 'search-items'"/>
+      <UUIDInput v-if="currentWidget === 'new-item'"/>
     </v-container>
   </v-main>
 </template>
@@ -17,6 +18,7 @@ import RequestItemWidget from '@/components/db-request-widgets/RequestItemWidget
 import QRUtility from '@/components/barcode-utility/QRUtility.vue';
 import UUIDItemRouter from '@/components/db-request-widgets/UUIDItemRouter.vue';
 import SearchUtility from '@/components/db-request-widgets/SearchUtility.vue';
+import UUIDInput from '@/components/db-request-widgets/UUIDInput.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -30,8 +32,9 @@ export default {
     RequestItemWidget,
     QRUtility,
     UUIDItemRouter,
-    SearchUtility
-  },
+    SearchUtility,
+    UUIDInput,
+},
   setup(props) {
     const route = useRoute();
     // Use the route's name to determine the current widget
